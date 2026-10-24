@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "Kinlume",
+  "short_name": "Kinlume",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf8f5",
+  "theme_color": "#111110",
+  "description": "Find community resources, plan visits, and coordinate donated items.",
+  "icons": [
+    {
+      "src": "/brand/kinlume-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/kinlume-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

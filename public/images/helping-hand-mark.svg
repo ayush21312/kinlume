@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- The hand is one continuous silhouette, with no finger details. -->
+  <path fill="#fff" d="m3 29 9-7c3-2 6-2 9-1l9 3c3 1 2 5-1 5h-9c-1 0-1 2 0 2h10c2 0 4-1 6-3l6-6c3-3 6 0 4 3l-9 11c-2 3-6 5-10 5H16l-8 4Z"/>
+  <path fill="#ff343b" d="M28 20c-1-1-11-7-11-13 0-6 8-7 11-2 3-5 11-4 11 2 0 6-10 12-11 13Z"/>
+</svg>

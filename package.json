@@ -1,0 +1,26 @@
+{
+  "name": "kinlume",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test",
+    "server": "node server/index.js",
+    "legal:generate": "node scripts/generate-legal.mjs",
+    "predev": "npm run legal:generate",
+    "prebuild": "npm run legal:generate"
+  },
+  "dependencies": {
+    "@photostructure/tz-lookup": "11.7.0",
+    "leaflet": "^1.9.4",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest"
+  }
+}

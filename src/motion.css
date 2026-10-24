@@ -1,0 +1,263 @@
+/* Small movements and short durations keep the app calm and responsive.
+   Never animate the phone shell or bottom navigation: their geometry stays fixed. */
+:root {
+  --motion-fast: 150ms;
+  --motion-page: 220ms;
+  --motion-ease: cubic-bezier(0.2, 0.65, 0.3, 1);
+}
+.page-content,
+.home-content,
+.survey-form {
+  animation: page-arrive var(--motion-page) var(--motion-ease) both;
+}
+@keyframes page-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+button,
+a,
+input,
+select,
+textarea,
+.survey-options label {
+  transition:
+    background-color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 3px;
+}
+.primary-button,
+.secondary-button,
+.icon-button,
+.save-button,
+.filter-button {
+  transition:
+    transform var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+:is(
+    .primary-button,
+    .secondary-button,
+    .icon-button,
+    .save-button,
+    .filter-button
+  ):active:not(:disabled) {
+  transform: scale(0.97);
+}
+.bottom-nav button::before {
+  transition: background-color var(--motion-fast) ease;
+}
+.bottom-nav svg {
+  transition: transform var(--motion-page) var(--motion-ease);
+}
+.bottom-nav button[aria-current="page"] svg {
+  transform: translateY(-2px);
+}
+.resource-card {
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+@media (hover: hover) {
+  .resource-card:hover {
+    box-shadow: none;
+  }
+  .primary-button:hover:not(:disabled) {
+    box-shadow: 0 3px 9px #98532c24;
+  }
+}
+.resource-image {
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+.resource-image.is-loaded {
+  opacity: 1;
+}
+.chat-message,
+.map-place,
+.location-form,
+.account-menu > div,
+.form-error,
+.notice {
+  animation: page-arrive var(--motion-page) var(--motion-ease) both;
+}
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.85em;
+  min-height: 24px;
+}
+.loading-symbol {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  border: 2px solid #c67c4e30;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: loading-turn 850ms linear infinite;
+}
+@keyframes loading-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.account-loading {
+  min-height: 300px;
+  display: grid;
+  place-content: center;
+}
+.account-loading .loading-indicator {
+  flex-direction: column;
+  gap: 18px;
+}
+.account-loading .loading-symbol {
+  width: 28px;
+  height: 28px;
+}
+.directory-status .loading-indicator {
+  font-size: inherit;
+}
+.loading-dots {
+  padding: 12px 2px;
+}
+.loading-dots .loading-symbol {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  border: 0;
+  animation: none;
+}
+.loading-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: loading-breathe 1100ms ease-in-out infinite;
+}
+.loading-dots i:nth-child(2) {
+  animation-delay: 140ms;
+}
+.loading-dots i:nth-child(3) {
+  animation-delay: 280ms;
+}
+@keyframes loading-breathe {
+  0%,
+  70%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+button[aria-busy="true"]::before {
+  content: "";
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-right: 9px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: loading-turn 850ms linear infinite;
+}
+.resource-skeleton {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.skeleton-surface {
+  background: linear-gradient(100deg, #eeeae5 25%, #f8f6f3 45%, #eeeae5 65%);
+  background-size: 250% 100%;
+  animation: skeleton-sweep 1600ms ease-in-out infinite;
+}
+.skeleton-photo {
+  aspect-ratio: 1.26;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.skeleton-line {
+  height: 12px;
+  border-radius: 4px;
+  margin: 10px 2px;
+  width: 85%;
+}
+.skeleton-short {
+  width: 62%;
+  height: 10px;
+}
+.skeleton-town {
+  width: 45%;
+  height: 10px;
+  margin-top: 22px;
+}
+@keyframes skeleton-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* Respect device accessibility settings, including image and scroll effects. */
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *,
+  .app-shell *::before,
+  .app-shell *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .resource-image {
+    opacity: 1;
+  }
+  .bottom-nav button[aria-current="page"] svg {
+    transform: none;
+  }
+}
+
+/* Planner and chat modes enter independently of the fixed screen frame. */
+.visit-form,
+.visit-results,
+.chat-welcome {
+  animation: page-arrive var(--motion-page) var(--motion-ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .visit-form,
+  .visit-results,
+  .chat-welcome {
+    animation: none;
+  }
+}
+
+@media (min-width: 600px) {
+  .skeleton-photo {
+    aspect-ratio: 1.45;
+  }
+}
+@media (min-width: 1000px) {
+  .skeleton-photo {
+    aspect-ratio: 1.7;
+  }
+}

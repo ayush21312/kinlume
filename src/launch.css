@@ -1,0 +1,87 @@
+/* Opening screen: the same title travels from the centre to the real header.
+   The app loads underneath; its layout and navigation never move. */
+.launch-root:not([data-launch-phase="done"]) .brand-name {
+  visibility: hidden;
+}
+.launch-overlay {
+  position: fixed;
+  z-index: 1000;
+  overflow: hidden;
+  color: white;
+  pointer-events: auto;
+}
+.launch-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 1;
+  transition: opacity 260ms ease 420ms;
+}
+.launch-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  white-space: nowrap;
+  font-size: var(--title-size, 21px);
+  font-weight: var(--title-weight, 600);
+  letter-spacing: var(--title-spacing, -0.4px);
+  line-height: 1.5;
+  transform: translate(-50%, -50%) scale(1.5);
+  transform-origin: center;
+  transition: transform 680ms cubic-bezier(0.65, 0, 0.2, 1);
+}
+.launch-loader {
+  position: absolute;
+  top: calc(50% + 50px);
+  left: 50%;
+  width: 64px;
+  height: 3px;
+  border-radius: 3px;
+  background: #ffffff26;
+  overflow: hidden;
+  transform: translateX(-50%);
+  transition: opacity 180ms ease;
+}
+.launch-loader span {
+  display: block;
+  width: 30px;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  animation: launch-progress 1100ms ease-in-out infinite;
+}
+@keyframes launch-progress {
+  from {
+    transform: translateX(-30px);
+  }
+  to {
+    transform: translateX(64px);
+  }
+}
+.launch-moving .launch-title {
+  transform: translate(
+      calc(-50% + var(--title-x, 0px)),
+      calc(-50% + var(--title-y, 0px))
+    )
+    scale(1);
+}
+.launch-moving .launch-backdrop,
+.launch-moving .launch-loader {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .launch-overlay {
+    display: none;
+  }
+  .launch-root .brand-name {
+    visibility: visible;
+  }
+  .launch-title,
+  .launch-backdrop,
+  .launch-loader {
+    transition: none;
+  }
+  .launch-loader span {
+    animation: none;
+  }
+}

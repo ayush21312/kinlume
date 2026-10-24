@@ -1,0 +1,88 @@
+:root {
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color: #292622;
+  background: #faf8f5;
+  line-height: 1.65;
+  font-size: 16px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+header {
+  background: #111110;
+  color: #fff;
+  padding: 24px max(24px, calc((100% - 760px) / 2));
+}
+header a {
+  color: inherit;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 600;
+}
+main,
+footer {
+  max-width: 808px;
+  margin: auto;
+  padding: 24px;
+}
+h1 {
+  font-size: 32px;
+  line-height: 1.2;
+  letter-spacing: -0.6px;
+  font-weight: 600;
+}
+h2 {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+  margin-top: 32px;
+}
+p {
+  margin: 12px 0;
+}
+a {
+  color: #98512e;
+  text-underline-offset: 3px;
+}
+a:focus-visible {
+  outline: 3px solid #98512e;
+  outline-offset: 4px;
+}
+.draft {
+  padding: 16px;
+  border: 1px solid #c67c4e;
+  border-radius: 8px;
+  background: #f6e9de;
+}
+.meta {
+  color: #70685f;
+}
+.legal-nav {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.legal-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+footer {
+  border-top: 1px solid #e4ddd4;
+  font-size: 14px;
+}
+header {
+  padding-top: max(24px, env(safe-area-inset-top));
+}
+@media (max-width: 420px) {
+  h1 {
+    font-size: 28px;
+  }
+  main,
+  footer {
+    padding: 20px;
+  }
+}

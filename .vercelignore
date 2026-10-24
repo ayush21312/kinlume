@@ -1,0 +1,13 @@
+# Never upload private accounts, keys, local records, or historical backups.
+.data/
+.env
+.env.*
+!.env.example
+!.env.server.example
+*.sqlite
+*.sqlite-*
+*.db
+*.log
+legacy/
+node_modules/
+.git/

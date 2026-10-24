@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+
+.env.server
+
+# Private accounts and shared application data
+.data/
+
+# Keep deployment-specific secrets out of version control too.
+.env.*
+!.env.example
+!.env.server.example
+.vercel/
