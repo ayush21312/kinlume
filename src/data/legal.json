@@ -19,7 +19,7 @@
     ],
     [
       "Accounts and appropriate use",
-      "Use accurate information, protect your password, and manage only organizations you are authorized to represent. Do not impersonate a nonprofit, publish fraudulent requests, post unlawful or abusive content, scrape personal information, or try to bypass security or ownership checks. This prototype does not provide email verification, account-recovery email, or a parental-consent process. Do not create accounts for children under 13."
+      "Use accurate information, protect your password, and manage only organizations you are authorized to represent. Do not impersonate a nonprofit, publish fraudulent requests, post unlawful or abusive content, scrape personal information, or try to bypass security or ownership checks. Hosted accounts use Supabase email confirmation when enabled. A password-recovery interface and a parental-consent process are not implemented. Do not create accounts for children under 13."
     ],
     [
       "Organization listings",
@@ -45,11 +45,11 @@
   "privacy": [
     [
       "Scope and current status",
-      "This draft describes the current Kinlume prototype, not a future hosted version. It uses a local Node server and SQLite database. It does not currently use Supabase. Operator and public contact information are intentionally blank. Hosting and email providers must be added to this notice when connected."
+      "This draft describes Kinlume’s current implementation. The hosted version uses Vercel for the interface and API functions, and Supabase for PostgreSQL database storage and authentication. Local development retains a separate SQLite database. Operator and public contact information are intentionally blank and must be completed before public registration."
     ],
     [
       "Information you provide",
-      "Accounts use an email address and password. The server stores a salted password hash rather than a readable password. Your survey can contain your purpose, preferred name, assistance needs, search area, travel and accessibility preferences, optional household range and circumstances, and optional notes. Organization managers submit public organization and resource information. Donors submit item quantities; the app stores pledges and delivery records."
+      "Accounts use an email address and password. Supabase manages hosted account passwords; local development stores salted password hashes. The interface does not display readable passwords. Your survey can contain your purpose, preferred name, assistance needs, search area, travel and accessibility preferences, optional household range and circumstances, and optional notes. Organization managers submit public organization and resource information. Donors submit item quantities; the app stores pledges and delivery records."
     ],
     [
       "How information is used",
@@ -69,15 +69,15 @@
     ],
     [
       "Cookies and device storage",
-      "A session cookie keeps you signed in and expires after seven days unless you sign out earlier. Browser localStorage keeps saved resource IDs and snapshots, your last search area, text-size preference, and any earlier device-only donation records. Saved places are not currently synced through your account. Chat transcripts and individual visit plans stay in the current React page session and are lost on reload. Clearing browser storage removes device records but does not delete server-side account records."
+      "Hosted sign-in uses Secure, HttpOnly access and refresh cookies. Access tokens last up to one hour; the browser refresh cookie lasts up to seven days unless you sign out. Supabase’s configured server-side session rules also apply. Local development uses a separate seven-day session cookie. Browser localStorage keeps saved resource IDs and snapshots, your last search area, text-size preference, and any earlier device-only donation records. Saved places are not currently synced through your account. Chat transcripts and individual visit plans stay in the current React page session and are lost on reload. Clearing browser storage removes device records but does not delete server-side account records."
     ],
     [
       "Retention and controls",
-      "Accounts, surveys, organization records, pledges, and deliveries remain in the local server database; automatic account deletion and a retention schedule are not implemented. Expired sessions are removed when a new session is created. You can edit preferences, disable saved-profile AI personalization, sign out, unsave places, and cancel eligible outstanding pledges. There is no self-service account export/deletion workflow or public contact channel yet. Those controls and a practical request process must be finalized before public launch."
+      "Accounts, surveys, organization records, pledges, and deliveries remain in the selected server database; automatic account deletion and a retention schedule are not implemented. Supabase manages hosted session records; expired local sessions are removed when a new session is created. You can edit preferences, disable saved-profile AI personalization, sign out, unsave places, and cancel eligible outstanding pledges. There is no self-service account export/deletion workflow or public contact channel yet. Those controls and a practical request process must be finalized before public launch."
     ],
     [
       "Security and technical records",
-      "The app uses password hashing, server-side session checks, and organization ownership checks. These measures do not guarantee security. Application code does not intentionally log chat text, questionnaire answers, or API keys; provider error codes and routine server diagnostics may be logged. Hosting and external services may collect additional technical records under their own policies. Public hosting requires HTTPS, production access controls, and backups."
+      "The app uses password hashing, server-side session checks, and organization ownership checks. These measures do not guarantee security. Application code does not intentionally log chat text, questionnaire answers, or API keys; provider error codes and routine server diagnostics may be logged. Hosting and external services may collect additional technical records under their own policies. Public hosting requires HTTPS, production access controls, and backups. Vercel and Supabase process infrastructure requests and authentication/database records under their own policies. Shared API limits use a hashed network-address bucket with short-lived counters."
     ],
     [
       "Advertising, children and policy changes",

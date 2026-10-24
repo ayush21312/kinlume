@@ -1,3 +1,4 @@
+import { applyWorkspaceAction } from "./workspaceAction.js";
 import { DatabaseSync } from "node:sqlite";
 import {
   randomBytes,
@@ -189,56 +190,14 @@ export class CommunityStore {
     this.db.exec("BEGIN IMMEDIATE");
     try {
       const rows = this.workspaces();
-      let target = rows.find((row) => row.owner === user.id);
-      if (
-        [
-          "pledge",
-          "receive",
-          "cancel",
-          "edit-request",
-          "close-request",
-        ].includes(action.type)
-      ) {
-        target = rows.find((row) =>
-          action.type === "pledge" || action.type.endsWith("request")
-            ? row.state.requests.some(
-                (item) => item.id === (action.requestId || action.id),
-              )
-            : row.state.pledges.some((item) => item.id === action.pledgeId),
-        );
-      }
-      if (!target) throw problem("Record not found.", 404);
-      const owner = target.owner === user.id;
-      const pledge = target.state.pledges.find(
-        (item) => item.id === action.pledgeId,
+      const { owner: targetOwner, next } = applyWorkspaceAction(
+        rows,
+        user,
+        action,
       );
-      if (
-        action.type === "cancel"
-          ? !owner && pledge?.donorId !== user.id
-          : action.type !== "pledge" && !owner
-      )
-        throw problem("You can only manage your own organization.", 403);
-      const trusted = { ...action };
-      if (action.type === "request") trusted.id = randomUUID();
-      if (action.type === "resource") {
-        if (
-          action.id &&
-          !(target.state.resources || []).some((item) => item.id === action.id)
-        )
-          throw problem("Resource not found.", 404);
-        trusted.id = action.id || `org-${randomUUID()}`;
-      }
-      if (action.type === "pledge") trusted.id = randomUUID();
-      const next = changeOrganization(target.state, trusted);
-      if (action.type === "import-device")
-        next.pledges.forEach((pledge) => {
-          pledge.donorId = user.id;
-        });
-      if (action.type === "pledge")
-        next.pledges.find((item) => item.id === trusted.id).donorId = user.id;
       this.db
         .prepare("UPDATE workspaces SET data=? WHERE owner_id=?")
-        .run(JSON.stringify(next), target.owner);
+        .run(JSON.stringify(next), targetOwner);
       this.db.exec("COMMIT");
     } catch (error) {
       this.db.exec("ROLLBACK");

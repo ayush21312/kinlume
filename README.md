@@ -181,3 +181,14 @@ Home offers explicit corrections for common service-word typos, without guessing
 city names. Chat and narrative fields request browser spelling assistance.
 All 93 tests and the production build passed after these refinements.
 
+
+## Hosted backend
+
+Vercel uses api/handler.js and vercel.json to serve /api requests. Hosted mode
+requires SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, APP_ORIGINS and configured AI
+variables as server secrets. Apply supabase/migrations/20261024_kinlume.sql once
+to a new project. Supabase Auth manages hosted accounts; local SQLite accounts
+are preserved separately. Cloud workspaces use version checks to prevent lost
+updates and overpledging. All browser database access is denied by default;
+verified server-side ownership rules control every mutation. The health endpoint
+checks connectivity without returning account data. See docs/Hosted-backend.md.

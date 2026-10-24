@@ -34,6 +34,11 @@ export default function AccountScreen({ account }) {
               {account.error}
             </p>
           )}
+          {account.notice && (
+            <p className="form-success" role="status">
+              {account.notice}
+            </p>
+          )}
           <AccountForm
             authenticate={account.authenticate}
             busy={account.busy}

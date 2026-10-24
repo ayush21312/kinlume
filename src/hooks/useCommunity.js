@@ -1,3 +1,4 @@
+import { responseJson } from "../utils/responseJson.js";
 import { useEffect, useState } from "react";
 const empty = {
   user: null,
@@ -20,7 +21,7 @@ export default function useCommunity() {
     })
       .then(async (response) => {
         if (!response.ok) throw new Error("Could not load your dashboard.");
-        return response.json();
+        return responseJson(response);
       })
       .then(setState)
       .catch((failure) => {
@@ -43,7 +44,7 @@ export default function useCommunity() {
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(15000),
       });
-      const data = await response.json();
+      const data = await responseJson(response);
       if (!response.ok)
         throw new Error(data.error || "Could not save this change.");
       setState(data);
@@ -67,6 +68,7 @@ export default function useCommunity() {
   return {
     state,
     error,
+    notice: state.notice || "",
     busy,
     loading,
     commit: (action) => send("action", { action }),

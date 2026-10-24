@@ -1,3 +1,4 @@
+import { responseJson } from "../utils/responseJson.js";
 import LoadingIndicator from "./LoadingIndicator.jsx";
 import { useEffect, useRef, useState } from "react";
 import Icon from "./Icon.jsx";
@@ -58,7 +59,7 @@ export default function AssistantView({
             .map(({ role, text }) => ({ role, text })),
         }),
       });
-      const data = await response.json();
+      const data = await responseJson(response);
       if (!response.ok) throw new Error(data.error || "Unable to get a reply.");
       onResources(data.resources || []);
       onMessagesChange([

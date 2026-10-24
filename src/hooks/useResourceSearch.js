@@ -1,3 +1,4 @@
+import { responseJson } from "../utils/responseJson.js";
 import { useEffect, useRef, useState } from "react";
 
 function storedSavedResources() {
@@ -90,7 +91,7 @@ export default function useResourceSearch(initialResources, category) {
     show(previous);
     fetch(`/api/resources?${params}`, { signal: controller.signal })
       .then(async (response) => {
-        const data = await response.json();
+        const data = await responseJson(response);
         if (!response.ok) {
           const error = new Error(
             data.error || "Resource search is temporarily unavailable.",

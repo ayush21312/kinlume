@@ -93,6 +93,11 @@ export default function DonateView() {
           Organization
         </button>
       </div>
+      {community.notice && (
+        <p className="form-success" role="status">
+          {community.notice}
+        </p>
+      )}
       {error && (
         <p className="form-error" role="alert">
           {error}

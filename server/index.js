@@ -9,18 +9,50 @@ import { chatIntent, searchForChat, directoryReply } from "./chat.js";
 import { buildVisitPlan, compactPlan } from "./visitPlanner.js";
 import { validatePlannerProfile } from "./plannerValidation.js";
 
-import { CommunityStore } from "./communityStore.js";
+import { CloudStore } from "./cloudStore.js";
+import { cloudCommunityApi } from "./cloudCommunityApi.js";
+import { cloudUser } from "./cloudSession.js";
+import { trustedOrigin, requestFingerprint } from "./cloud-security.js";
 import { communityApi, accountFromRequest } from "./communityApi.js";
 import { setCommunityResourceSource } from "./communityDirectory.js";
 import { assistantProfile } from "./personalProfile.js";
 const envFile = fileURLToPath(new URL("../.env.server", import.meta.url));
 if (existsSync(envFile)) process.loadEnvFile(envFile);
 const ai = aiConfiguration();
-const dataDirectory = fileURLToPath(new URL("../.data/", import.meta.url));
-mkdirSync(dataDirectory, { recursive: true });
-const communityStore = new CommunityStore(dataDirectory + "community.sqlite");
-const handleCommunity = communityApi(communityStore, { json, requestBody });
-setCommunityResourceSource(() => communityStore.publicResources());
+const hosted = Boolean(
+  process.env.VERCEL || process.env.STORAGE_BACKEND === "supabase",
+);
+let communityStore;
+let cloud;
+let publishedResources = [];
+if (hosted) {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    cloud = new CloudStore({
+      url: process.env.SUPABASE_URL,
+      serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    });
+    communityStore = cloud;
+  }
+} else {
+  const { CommunityStore } = await import("./communityStore.js");
+  const dataDirectory = fileURLToPath(new URL("../.data/", import.meta.url));
+  mkdirSync(dataDirectory, { recursive: true });
+  communityStore = new CommunityStore(dataDirectory + "community.sqlite");
+}
+const handleCommunity = cloud
+  ? cloudCommunityApi(cloud, { json, requestBody })
+  : communityStore
+    ? communityApi(communityStore, { json, requestBody })
+    : async (request, response, url) => {
+        if (!url.pathname.startsWith("/api/community")) return false;
+        json(response, 503, {
+          error: "Account service setup is incomplete. Please try again later.",
+        });
+        return true;
+      };
+setCommunityResourceSource(() =>
+  hosted ? publishedResources : communityStore.publicResources(),
+);
 let busy = false;
 let aiRequests = [];
 let planRequests = [];
@@ -35,6 +67,21 @@ function json(response, status, data) {
 }
 
 async function requestBody(request) {
+  if (request.body !== undefined) {
+    const raw =
+      typeof request.body === "string"
+        ? request.body
+        : JSON.stringify(request.body);
+    if (Buffer.byteLength(raw) > 24000)
+      throw Object.assign(new Error("This request is too long."), {
+        status: 413,
+      });
+    try {
+      return JSON.parse(raw);
+    } catch {
+      throw Object.assign(new Error("Send a valid request."), { status: 400 });
+    }
+  }
   const chunks = [];
   let length = 0;
   for await (const chunk of request) {
@@ -53,10 +100,31 @@ async function requestBody(request) {
   }
 }
 
-const server = http.createServer(async (request, response) => {
+async function handleRequest(request, response) {
   const url = new URL(request.url, "http://127.0.0.1:3001");
   if (await handleCommunity(request, response, url)) return;
+  if (
+    cloud &&
+    ["/api/resources", "/api/assistant", "/api/plan"].includes(url.pathname)
+  ) {
+    await cloud.limit(`public:${requestFingerprint(request)}`, 90);
+    if (url.pathname === "/api/assistant") {
+      await cloud.limit(`chat:${requestFingerprint(request)}`, 12);
+      await cloud.limit("chat:global", 60);
+    }
+    publishedResources = await cloud.publicResources();
+  }
   if (request.method === "GET") {
+    if (url.pathname === "/api/health") {
+      if (cloud)
+        await cloud.request(
+          "/rest/v1/kinlume_workspaces?select=version&limit=1",
+        );
+      return json(response, communityStore ? 200 : 503, {
+        ok: Boolean(communityStore),
+        storage: hosted ? "supabase" : "sqlite",
+      });
+    }
     if (url.pathname === "/api/assistant/status")
       return json(response, 200, await aiStatus(ai));
     if (url.pathname === "/api/resources") {
@@ -98,13 +166,9 @@ const server = http.createServer(async (request, response) => {
     return json(response, 404, { error: "Not found." });
   // Public deployment needs authentication and per-account limits. This server
   // accepts writes only from the local development app.
-  if (
-    !/^http:\/\/(127\.0\.0\.1|localhost):(517[3-9]|518[0-3]|4173)$/.test(
-      request.headers.origin || "",
-    )
-  )
+  if (!trustedOrigin(request.headers.origin))
     return json(response, 403, {
-      error: "Open the app from its local development address.",
+      error: "Open the app from its approved address.",
     });
   if (!request.headers["content-type"]?.startsWith("application/json"))
     return json(response, 415, { error: "Send JSON." });
@@ -148,9 +212,12 @@ const server = http.createServer(async (request, response) => {
   let input;
   try {
     input = validateRequest(body);
-    const personal = communityStore.profile(
-      accountFromRequest(request, communityStore),
-    );
+    const user = cloud
+      ? await cloudUser(request, response, cloud)
+      : communityStore
+        ? accountFromRequest(request, communityStore)
+        : null;
+    const personal = communityStore ? await communityStore.profile(user) : null;
     input.personalContext = assistantProfile(personal);
     if (input.personalContext) {
       input.profile.transport = personal.transport;
@@ -265,9 +332,25 @@ const server = http.createServer(async (request, response) => {
   } finally {
     busy = false;
   }
-});
+}
 
-server.requestTimeout = 90000;
-server.listen(3001, "127.0.0.1", () =>
-  console.log("Kinlume API: http://127.0.0.1:3001"),
-);
+// Export the handler for Vercel; start an HTTP listener only in local development.
+export default async function handler(request, response) {
+  try {
+    await handleRequest(request, response);
+  } catch (error) {
+    if (!response.headersSent)
+      json(response, error.status || 503, {
+        error: error.status
+          ? error.message
+          : "The service is temporarily unavailable. Please try again.",
+      });
+  }
+}
+if (!process.env.VERCEL) {
+  const server = http.createServer(handler);
+  server.requestTimeout = 90000;
+  server.listen(3001, "127.0.0.1", () =>
+    console.log("Kinlume API: http://127.0.0.1:3001"),
+  );
+}

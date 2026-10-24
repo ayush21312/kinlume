@@ -1,3 +1,4 @@
+import { responseJson } from "../utils/responseJson.js";
 import { useEffect, useRef, useState } from "react";
 import SaveButton from "./SaveButton.jsx";
 import Icon from "./Icon.jsx";
@@ -94,7 +95,7 @@ export default function VisitPlanner({
         body: JSON.stringify({ profile: updated }),
         signal: controller.signal,
       });
-      const data = await response.json();
+      const data = await responseJson(response);
       if (!response.ok)
         throw new Error(
           data.error || "Could not build a plan. Please try again.",
