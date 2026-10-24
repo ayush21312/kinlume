@@ -16,6 +16,16 @@ function AccountApp() {
     </AppLaunch>
   );
 }
+// Confirmation links may contain tokens. This app uses server cookies instead,
+// so discard unused link tokens before they can linger in history/screenshots.
+const linkTokens = new URLSearchParams(window.location.hash.slice(1));
+if (linkTokens.has("access_token") || linkTokens.has("refresh_token")) {
+  window.history.replaceState(
+    null,
+    "",
+    window.location.pathname + window.location.search,
+  );
+}
 // Mount the React component tree inside index.html's root element.
 createRoot(document.getElementById("root")).render(
   <StrictMode>

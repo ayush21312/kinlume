@@ -244,3 +244,19 @@ test("HTML deployment failures become a readable message rather than a JSON pars
     { ok: true },
   );
 });
+
+test("email-sender restrictions do not misleadingly blame the user's password", async () => {
+  const db = new CloudStore({
+    url: "https://example.supabase.co",
+    serviceKey: "test-key",
+    fetchImpl: async () =>
+      new Response(
+        JSON.stringify({ error_code: "email_address_not_authorized" }),
+        { status: 400 },
+      ),
+  });
+  await assert.rejects(
+    db.authenticate("test@example.invalid", "Example-test-password", true),
+    (error) => error.status === 503 && !error.message.includes("password"),
+  );
+});

@@ -56,7 +56,9 @@ export function cloudCommunityApi(store, { json, requestBody }) {
       }
     } catch (error) {
       json(response, error.status || 400, {
-        error: error.status ? error.message : "Could not save this change. Check the fields and try again.",
+        error: error.status
+          ? error.message
+          : "Could not save this change. Check the fields and try again.",
       });
     }
     return true;

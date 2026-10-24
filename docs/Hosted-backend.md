@@ -25,3 +25,5 @@ kinlume_profiles holds validated private surveys keyed to the verified user. kin
 The workspace model preserves the prototype's rules. A large deployment should normalize tables and scope/paginate public listing queries. Further production work includes idempotency identifiers, an audit log, backups, appropriate retention and data-request controls.
 
 Local users are not automatically migrated to Supabase. Never upload .data/community.sqlite. Hosted users create hosted accounts. Legal documents remain drafts until operator/contact details and public request procedures are completed.
+
+Public sign-ups require a custom SMTP provider: Supabase's default sender is restricted to project-team addresses. Do not disable email confirmation to bypass this restriction. The current sender is not configured for arbitrary public registration. Reference: https://supabase.com/docs/guides/auth/auth-smtp

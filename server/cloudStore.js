@@ -36,6 +36,11 @@ export class CloudStore {
     if (!response.ok) {
       // Never forward provider diagnostics, SQL, credentials or email addresses.
       const code = data?.error_code || data?.code;
+      if (code === "email_address_not_authorized")
+        throw problem(
+          "Account creation is temporarily unavailable. Please try again later.",
+          503,
+        );
       if (response.status === 429)
         throw problem("Please wait a moment before trying again.", 429);
       if (code === "email_not_confirmed")
