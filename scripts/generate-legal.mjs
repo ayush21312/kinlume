@@ -42,7 +42,7 @@ for (const [kind, title] of [
   const html =
     '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><title>' +
     title +
-    ' · Kinlume</title><link rel="icon" href="/brand/kinlume-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/legal.css"></head><body><header><a href="/">Kinlume</a></header><main><nav class="legal-nav" aria-label="Legal information"><a href="/">Back to app</a><a href="/terms.html">Terms of service</a><a href="/privacy.html">Privacy policy</a></nav><h1>' +
+    ' · Kinlume</title><link rel="icon" href="/brand/kinlume-icon.svg?v=2" type="image/svg+xml"><link rel="stylesheet" href="/legal.css"></head><body><header><a href="/">Kinlume</a></header><main><nav class="legal-nav" aria-label="Legal information"><a href="/">Back to app</a><a href="/terms.html">Terms of service</a><a href="/privacy.html">Privacy policy</a></nav><h1>' +
     title +
     '</h1><p class="meta">Updated ' +
     escape(policy.updated) +
